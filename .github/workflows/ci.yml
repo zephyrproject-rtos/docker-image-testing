@@ -2,10 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [ testing-master ]
-    tags: [ 'v*' ]
+    branches:
+    - testing-master
+    - v*-branch
+    tags:
+    - v*
   pull_request:
-    branches: [ testing-master ]
+    branches:
+    - testing-master
+    - v*-branch
 
 permissions:
   packages: write
@@ -61,6 +66,12 @@ jobs:
       with:
         images: |
           ghcr.io/zephyrproject-rtos/ci-testing
+        flavor: |
+          latest=false
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=raw,value=latest,enable={{is_default_branch}}
 
     - name: Generate push metadata for Developer image
       if: ${{ github.event_name != 'pull_request' }}
@@ -69,6 +80,12 @@ jobs:
       with:
         images: |
           ghcr.io/zephyrproject-rtos/zephyr-build-testing
+        flavor: |
+          latest=false
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=raw,value=latest,enable={{is_default_branch}}
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
